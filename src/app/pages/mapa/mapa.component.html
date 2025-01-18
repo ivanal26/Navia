@@ -1,0 +1,15 @@
+<div id="map" class="h-screen w-full absolute top-0 left-0"></div>
+<p-dialog 
+  header="Detalles del marcador"
+  [(visible)]="isVisibleModal" 
+  [modal]="true" 
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" 
+  [style]="{ width: '50vw' }" 
+  [draggable]="false" 
+  [resizable]="false"
+  (onHide)="isVisibleModal = false">
+  <ng-container *ngIf="modalData">
+    <p>Latitud: {{ modalData.lat }}</p>
+    <p>Longitud: {{ modalData.lng }}</p>
+  </ng-container>
+</p-dialog>

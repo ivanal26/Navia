@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 import * as L from 'leaflet';
 import { DialogModule } from 'primeng/dialog';
+import { Marker } from '../../models/marker.model';
+import { MarkersService } from '../../services/markers.service';
 
 @Component({
   selector: 'app-mapa',
@@ -12,22 +14,30 @@ import { DialogModule } from 'primeng/dialog';
 export class Mapa implements AfterViewInit {
   private map!: L.Map;
   isVisibleModal: boolean = false;
-  modalData: { lat: number; lng: number } | null = null; // Datos del marcador
+  modalData: { lat: number; lng: number } | null = null;
+  markers: L.Marker[] = [];
 
-  markers: L.Marker[] = [
-    L.marker([40.423382, -3.712165]),
-    L.marker([37.984047, -1.128575]),
-  ];
+  constructor(private markersService: MarkersService) {}
 
   ngAfterViewInit() {
     this.inicializarMapa();
-    this.agregarMarcadores();
-    this.centrarMapa();
+    this.cargarMarcadores();
     this.agregarEventoDobleClick();
   }
 
+  private cargarMarcadores() {
+    this.markersService.getMarkers().subscribe((markers) => {
+      markers.forEach((m: Marker) => {
+        this.markers.push(L.marker([Number(m.latitud), Number(m.longitud)]));
+      });
+
+      this.agregarMarcadores();
+      this.centrarMapa();
+    });
+  }
+
   private inicializarMapa() {
-    const baseMapURl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+    const baseMapURl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     this.map = L.map('map');
     L.tileLayer(baseMapURl).addTo(this.map);
     this.map.doubleClickZoom.disable();
@@ -45,7 +55,6 @@ export class Mapa implements AfterViewInit {
     const bounds = L.latLngBounds(
       this.markers.map((marker) => marker.getLatLng())
     );
-     // Ajustar la vista del mapa para que se ajuste a los límites
     this.map.fitBounds(bounds);
   }
 

@@ -1,4 +1,4 @@
-export class Localizacion {
+export class Marker {
   nombre: string;
   descripcion: string;
   latitud: string;
